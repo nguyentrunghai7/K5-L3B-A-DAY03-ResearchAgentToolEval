@@ -1,8 +1,8 @@
-# Báo cáo cá nhân — LeDucPhucLam-2A202603787
+# Báo cáo cá nhân — LeDucTrucLam-2A202603787
 
 ## 1. Thông tin thành viên
 
-- Họ tên: Lê Đức Phúc Lâm
+- Họ tên: Lê Đức Trúc Lâm
 - MSSV: 2A202603787
 - Email: 26ai.lamldt@vinuni.edu.vn
 
