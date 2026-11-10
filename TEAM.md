@@ -2,17 +2,18 @@
 
 ## Thông tin nhóm
 
-- Tên nhóm:
+- Tên nhóm: A nhóm A 
 - Lớp: L3A / L3B
-- Repo nhóm: `K5-L3A-DAY03-TenNhom-ResearchAgentToolEval` hoặc `K5-L3B-DAY03-TenNhom-ResearchAgentToolEval` (xem [SUBMISSION.md](SUBMISSION.md))
+- Repo nhóm: `K5-L3A-DAY03-A-ResearchAgentToolEval` hoặc `K5-L3B-DAY03-TenNhom-ResearchAgentToolEval` (xem [SUBMISSION.md](SUBMISSION.md))
 - URL repo, nhánh nộp, commit chốt:
 
 ## Thành viên
 
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
-|   1 |        |      |       |        |         |
-|   2 |        |      |       |        |         |
+|   1 | Vũ Tuấn Đạt | 2A202603744 | 26ai.datvt@vinuni.edu.vn | datkunal | CP1 (setup, baseline v0), UI và live chat (CP5) |
+|   2 | Nguyễn Trung Hải | 2A202603728 | 26ai.haint2@vinuni.edu.vn | nguyentrunghai7 | CP2 (tối ưu v1–v3), báo cáo nhóm |
+|   3 | Lê Đức Phúc Lâm | 2A202603787 | 26ai.lamldt@vinuni.edu.vn | truclamld | CP3 (tool `dedupe`, unit test), CP4 (eval nhóm) |
 
 ## Cá nhân
 

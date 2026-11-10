@@ -1,0 +1,890 @@
+{
+  "run_id": "v3_B_group_openrouter_20261110T182350557552",
+  "version": "v3",
+  "artifact_version": "v3+pa9083eb83825+t39c1b29ad6f5",
+  "prompt_hash": "a9083eb83825ec970c523cf50967c1b04642a912932b01685ad94e13bc6f12e6",
+  "tools_hash": "39c1b29ad6f528fac8f83a0ee15fd64876fc16dc5255863fbbd269927be038bd",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "D:\\AI thực chiến\\10thang11\\K5-L3B-A-DAY03-ResearchAgentToolEval\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\AI thực chiến\\10thang11\\K5-L3B-A-DAY03-ResearchAgentToolEval\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_group.json",
+  "dataset_id": "day03_v2_research_group",
+  "dataset_role": "group",
+  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
+  "generated_at": "2026-11-10T18:23:50",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 8,
+    "case_accuracy": 0.8,
+    "tool_routing_accuracy": 0.8,
+    "argument_accuracy": 0.8,
+    "multiturn_accuracy": 0.6,
+    "failure_counts": {
+      "wrong_arg_value": 1,
+      "missing_info": 1
+    },
+    "observed_mismatch_counts": {
+      "extra_tool_call": 1,
+      "missing_tool_call": 1
+    }
+  },
+  "results": [
+    {
+      "id": "G01_dedupe_by_url",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "route_to_new_tool",
+        "difficulty": "medium",
+        "what_it_tests": "Tool mới dedupe: user đưa danh sách có link lặp và yêu cầu lọc trùng theo URL -> phải gọi dedupe với key=url, không tự lọc bằng text và không gọi format."
+      },
+      "input": "Lọc trùng giúp mình danh sách này theo URL: 1) 'OpenAI ra mô hình mới' - https://openai.com/blog/new-model?utm_source=tw 2) 'OpenAI ra mô hình mới' - https://www.openai.com/blog/new-model/ 3) 'Anthropic cập nhật Claude' - https://anthropic.com/news/claude-update",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "dedupe",
+            "args": {
+              "key": "url"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "dedupe",
+            "args": {
+              "items": [
+                {
+                  "title": "OpenAI ra mô hình mới",
+                  "url": "https://openai.com/blog/new-model?utm_source=tw",
+                  "summary": ""
+                },
+                {
+                  "title": "OpenAI ra mô hình mới",
+                  "url": "https://www.openai.com/blog/new-model/",
+                  "summary": ""
+                },
+                {
+                  "title": "Anthropic cập nhật Claude",
+                  "url": "https://anthropic.com/news/claude-update",
+                  "summary": ""
+                }
+              ],
+              "key": "url"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "dedupe",
+          "args": {
+            "items": [
+              {
+                "title": "OpenAI ra mô hình mới",
+                "url": "https://openai.com/blog/new-model?utm_source=tw",
+                "summary": ""
+              },
+              {
+                "title": "OpenAI ra mô hình mới",
+                "url": "https://www.openai.com/blog/new-model/",
+                "summary": ""
+              },
+              {
+                "title": "Anthropic cập nhật Claude",
+                "url": "https://anthropic.com/news/claude-update",
+                "summary": ""
+              }
+            ],
+            "key": "url"
+          },
+          "result": {
+            "tool": "dedupe",
+            "key": "url",
+            "items": [
+              {
+                "title": "OpenAI ra mô hình mới",
+                "url": "https://openai.com/blog/new-model?utm_source=tw",
+                "summary": ""
+              },
+              {
+                "title": "Anthropic cập nhật Claude",
+                "url": "https://anthropic.com/news/claude-update",
+                "summary": ""
+              }
+            ],
+            "item_count": 2,
+            "removed_count": 1,
+            "skipped_invalid": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_out_of_scope_translate",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "out_of_scope_translation",
+        "difficulty": "easy",
+        "what_it_tests": "Yêu cầu dịch thuật nằm ngoài phạm vi research -> KHÔNG gọi tool nào (đặc biệt không gọi send hay lookup)."
+      },
+      "input": "Dịch giúp mình câu 'Good morning, how are you?' sang tiếng Pháp.",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Câu \"Good morning, how are you?\" được dịch sang tiếng Pháp là \"Bonjour, comment ça va ?\"",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G03_handle_without_at",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_convention_handle_no_at",
+        "difficulty": "medium",
+        "what_it_tests": "Convention args: user gõ @karpathy nhưng screenname phải là 'karpathy' (không có @), limit=4 lấy đúng số user nói."
+      },
+      "input": "Xem 4 bài đăng gần đây của @karpathy",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "karpathy",
+              "limit": 4
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "karpathy",
+              "limit": 4
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "karpathy",
+            "limit": 4
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "karpathy",
+            "items": [
+              {
+                "title": "Earlier this week Tristan published his top YouTube channels:",
+                "summary": "Earlier this week Tristan published his top YouTube channels:\nhttps://t.co/NZ3UCNo6cT\nWhich looked excellent so clearly I had to turn it into TristanTube:\nhttps://t.co/l0KyW1WdNH\n47K super nerdy videos +TV mode for laid back watching. (One-shotted with Claude Code in 3 minutes)",
+                "url": "https://x.com/karpathy/status/2119114537442189652",
+                "source": "@karpathy",
+                "date": "Sat Nov 07 17:07:31 +0000 2026",
+                "metrics": {
+                  "favorites": 9177,
+                  "retweets": 772,
+                  "views": "944668"
+                }
+              },
+              {
+                "title": "Weekend hack: HackerTube. I was annoyed with YouTube's recommendations so I had Claude filter down 43M comments over 20 ",
+                "summary": "Weekend hack: HackerTube. I was annoyed with YouTube's recommendations so I had Claude filter down 43M comments over 20 years of HN to 6,454 videos that keep being recommended. *Significantly* better viewing experience, ~2 hours with Opus 5.5:\nhttps://t.co/JIhXN7OSh1\n\n- Excellent recs without any logins (state is kept in local browser session)\n- Thumbnail is a representative frame from middle of the video instead of the super duper A/B test hyper-optimized user uploads\n- Underlying data from the comment analysis as one zip file, point your Claude at it and ask for your own version\n- HackerTube Longs ✊\n\nA bit more on the process:\nI use Claude Code (desktop app for Mac), Opus 5.5 on Medium effort as my default. I only talk to Claude and have it do everything, the only \"manual work\" I helped with in tandem was in the browser (reminiscent of MenuGen): 1) I had to create some kind of API key from Google Cloud UI to query YouTube for video metadata, 2) I booted up a VPS box for serving and 3) I bought the domain name. Once the box was up I gave Claude the IP and told it update, secure, harden, deploy and optimize the code, and it did the whole thing.\n\nMany awesome projects that would have normally taken weeks/months even can now be few-shotted for breakfast. What else are we not thinking of.",
+                "url": "https://x.com/karpathy/status/2116957135661945283",
+                "source": "@karpathy",
+                "date": "Sun Nov 01 18:14:46 +0000 2026",
+                "metrics": {
+                  "favorites": 52355,
+                  "retweets": 4836,
+                  "views": "5724632"
+                }
+              },
+              {
+                "title": "RT @Tristan0x: If you've ever wondered why smart TVs are so cheap, this is why.",
+                "summary": "RT @Tristan0x: If you've ever wondered why smart TVs are so cheap, this is why.\n\n@log4j rooted his Samsung and found an always-on hot mic,…",
+                "url": "https://x.com/karpathy/status/2114384346815820050",
+                "source": "@karpathy",
+                "date": "Sun Oct 25 15:51:26 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 3287,
+                  "views": "40227"
+                }
+              },
+              {
+                "title": "Dusting off this tweet from April because this gap in shared understanding of LLM capability is *widening*. It's now les",
+                "summary": "Dusting off this tweet from April because this gap in shared understanding of LLM capability is *widening*. It's now less \"two groups of people speaking past each other\" and more a sharp funnel.\n\n- Napkin math somewhere around 6B people (~75% of the population) have barely come in contact with LLMs at all.\n- Around 1-2B (~20%) are casual and infrequent users of free-tier ChatGPT-like products. This group sees derpy chatbots and treats them a bit like a better Google search, a writing aid, or etc. Maybe an agent tries to book you a flight. I have non-tech friends who (reasonably, imo) say they have not much use for it at all. Even many professionals outside of math&code are in this tier. For example, execs and many other functions spend a lot of their time talking to other people, so while they understand what is happening intellectually, it is still second-hand and a bit abstract.\n- Now we get to professional use of frontier-grade LLMs in math&code. Somewhere around 20M people (0.2%) see first-hand that large, complex projects that used to take them weeks/months can now be completed by agents with a prompt. Building apps, copying apps, translating apps, decompiling apps from binaries... This has all happened very quickly and recently - less than 1 year ago, I was writing code manually by hand, typing memorized computer code commands into a code editor character by character, occasionally pressing Tab to autocomplete a little chunk of code.\n- And finally we get to the ~5,000 people (~0.00006%) with access to frontier-grade systems internally. The external world has seen the preview. It looks like swarms of thousands of agents collaborating over weeks on software mega projects: minting zero days, running cyber attacks and defenses at machine speeds, discovering new science, advancing the frontier of mathematics. Things that would have taken top professionals in the industry years of work. Meanwhile, human review and comprehension are starting to fall behind. For example, people are still involved in the \"archeology\" of the OpenAI-HF incident from many months ago. Mathematicians may be poring over the 722 manuscripts on frontier mathematics for a while.\n\nThe funnel is driven by a combination of factors:\n1. The impact scales with ambition, problem size, and horizon. A question with a paragraph answer barely stresses the system. You need a reservoir of big, difficult problems that you really care about. This aspect drives the consumer / professional dimension of the funnel.\n2. The jaggedness of the system (which I have written about a lot separately). Capability peaks in domains that are digital, verifiable and economically valuable. This is because LLM capability emerges from reinforcement learning on verifiable rewards on a curated environment mixture driven by revenue potential. This aspect primarily drives the area (e.g. math&code) dimension of the funnel.\n3. Access. Free-tier, paid-tier, internal.\n\nSo this is the weirdness of the moment. The general public has mostly not interacted with these systems. When they have, it looks like a derpy chatbot. The majority of professionals still see only a modest uplift. And a small sliver of professionals are experiencing the vertigo of the curve going vertical. And it is all happening at the same time.",
+                "url": "https://x.com/karpathy/status/2109361546505966046",
+                "source": "@karpathy",
+                "date": "Sun Oct 11 19:12:37 +0000 2026",
+                "metrics": {
+                  "favorites": 44256,
+                  "retweets": 5926,
+                  "views": "6980288"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_org_mention_is_social_search",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_social_search_vs_timeline",
+        "difficulty": "medium",
+        "what_it_tests": "Tìm tweet NHẮC ĐẾN một tổ chức là tìm theo từ khóa (social_search, search_type=Latest), không phải xem bài của tài khoản Anthropic (timeline)."
+      },
+      "input": "Tìm các tweet mới nhất nhắc đến Anthropic",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Anthropic",
+              "search_type": "Latest"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Anthropic",
+              "search_type": "Latest"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "Anthropic",
+            "search_type": "Latest"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "Anthropic",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "2026年11月10日，安全公司 Apiiro 称已在1,994个公开 GitHub 仓库中发现2,539个与 Claude Code 使用过程有关的真实凭据，根源是“允许执行且不再询问”功能可能把含密码或令牌的完整命令写入 `.claud",
+                "summary": "2026年11月10日，安全公司 Apiiro 称已在1,994个公开 GitHub 仓库中发现2,539个与 Claude Code 使用过程有关的真实凭据，根源是“允许执行且不再询问”功能可能把含密码或令牌的完整命令写入 `.claude/settings.local.json`，并随项目提交公开。Anthropic Claude Code 负责人已表示正在研究自动权限控制和内置秘密扫描等改进，但公开信息显示官方尚未发布正式修复；受影响用户应立即撤销并轮换凭据，再清理 Git 历史与公开分叉。",
+                "url": "https://x.com/sfywyq/status/2120115046869057712",
+                "source": "@sfywyq",
+                "date": "Tue Nov 10 11:23:11 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@TheMindScourge @Empty_America Ok, it actually doesn’t matter at all, cuz these kids won’t matter at all with that upbri",
+                "summary": "@TheMindScourge @Empty_America Ok, it actually doesn’t matter at all, cuz these kids won’t matter at all with that upbringing, in contrast to these of ppl working in anthropic.",
+                "url": "https://x.com/Serwuna3g/status/2120115041882038353",
+                "source": "@Serwuna3g",
+                "date": "Tue Nov 10 11:23:10 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@felixrieseberg It would be great if Anthropic would take responsibility for any mistakes the AI does. It screws up the ",
+                "summary": "@felixrieseberg It would be great if Anthropic would take responsibility for any mistakes the AI does. It screws up the code base? Anthropic should pay back the tokens and engineering time spent fixing it. It screw up any investigation? Same thing.",
+                "url": "https://x.com/jimnasyum/status/2120115014074048878",
+                "source": "@jimnasyum",
+                "date": "Tue Nov 10 11:23:03 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "\"5x or 20x more usage\" holds per five-hour session but not for weekly caps, two Claude Max subscribers allege, and a jud",
+                "summary": "\"5x or 20x more usage\" holds per five-hour session but not for weekly caps, two Claude Max subscribers allege, and a judge let their suit against Anthropic proceed. Have you hit a Claude weekly cap before your session limit ran out? https://t.co/aFySSCkit4",
+                "url": "https://x.com/claude_news/status/2120115003608998139",
+                "source": "@claude_news",
+                "date": "Tue Nov 10 11:23:01 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "Anthropic’s nearly $70 billion IPO plan briefly circulated to banks, then retracted https://t.co/O4Em1uFeCJ",
+                "summary": "Anthropic’s nearly $70 billion IPO plan briefly circulated to banks, then retracted https://t.co/O4Em1uFeCJ",
+                "url": "https://x.com/mi_jim/status/2120114998399676740",
+                "source": "@mi_jim",
+                "date": "Tue Nov 10 11:23:00 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_thanks_no_tool",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "no_tool_closing",
+        "difficulty": "easy",
+        "what_it_tests": "Câu cảm ơn/kết thúc hội thoại -> trả lời lịch sự, KHÔNG gọi tool nào (không clarify, không send)."
+      },
+      "input": "Cảm ơn bạn nhé, mình xong việc rồi!",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Không có gì! Nếu bạn cần thêm bất kỳ sự trợ giúp nào trong tương lai, đừng ngần ngại hỏi. Chúc bạn có một ngày tuyệt vời!",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G06_send_after_confirmation",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "send_after_explicit_confirmation",
+        "difficulty": "hard",
+        "what_it_tests": "Ranh giới xác nhận của send: sau khi user đã xác nhận rõ ở lượt cuối thì phải gọi send với confirmed=true, không hỏi lại thêm lần nữa và không để confirmed=false."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mình muốn đăng một bản tin lên Telegram với nội dung: 'AI hôm nay: có mô hình mới được công bố'"
+        },
+        {
+          "role": "user",
+          "content": "Nội dung đúng rồi, không cần sửa gì"
+        },
+        {
+          "role": "user",
+          "content": "Mình xác nhận, gửi đi ngay bây giờ"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "confirmed": true
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "text": "AI hôm nay: có mô hình mới được công bố",
+              "confirmed": true
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "send",
+          "args": {
+            "text": "AI hôm nay: có mô hình mới được công bố",
+            "confirmed": true
+          },
+          "result": {
+            "tool": "send_telegram",
+            "error": "RuntimeError",
+            "message": "Missing TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID env var"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_dedupe_title_carryover",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "new_tool_arg_from_last_turn",
+        "difficulty": "hard",
+        "what_it_tests": "Tool mới dedupe qua nhiều lượt: danh sách ở lượt 1, lượt cuối đổi tiêu chí sang tiêu đề -> dedupe với key=title (không dùng mặc định url)."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mình có 3 tin: 'GPT mới ra mắt' (https://a.com/1), 'gpt mới ra mắt' (https://b.com/2), 'Claude cập nhật' (https://c.com/3)"
+        },
+        {
+          "role": "user",
+          "content": "Gộp các tin trùng giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "Chỉ xét trùng theo tiêu đề thôi nhé, không quan tâm link"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "dedupe",
+            "args": {
+              "key": "title"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "dedupe",
+            "args": {
+              "items": [
+                {
+                  "title": "GPT mới ra mắt",
+                  "url": "https://a.com/1",
+                  "source": "",
+                  "summary": ""
+                },
+                {
+                  "title": "gpt mới ra mắt",
+                  "url": "https://b.com/2",
+                  "source": "",
+                  "summary": ""
+                },
+                {
+                  "title": "Claude cập nhật",
+                  "url": "https://c.com/3",
+                  "source": "",
+                  "summary": ""
+                }
+              ],
+              "key": "title"
+            }
+          },
+          {
+            "name": "format",
+            "args": {
+              "items": [
+                {
+                  "title": "GPT mới ra mắt",
+                  "url": "https://a.com/1",
+                  "source": "",
+                  "summary": ""
+                },
+                {
+                  "title": "Claude cập nhật",
+                  "url": "https://c.com/3",
+                  "source": "",
+                  "summary": ""
+                }
+              ],
+              "template": "sections",
+              "headline": "Tin tức đã gộp"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "extra_tool_call",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "extra tool call format"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "dedupe",
+          "args": {
+            "items": [
+              {
+                "title": "GPT mới ra mắt",
+                "url": "https://a.com/1",
+                "source": "",
+                "summary": ""
+              },
+              {
+                "title": "gpt mới ra mắt",
+                "url": "https://b.com/2",
+                "source": "",
+                "summary": ""
+              },
+              {
+                "title": "Claude cập nhật",
+                "url": "https://c.com/3",
+                "source": "",
+                "summary": ""
+              }
+            ],
+            "key": "title"
+          },
+          "result": {
+            "tool": "dedupe",
+            "key": "title",
+            "items": [
+              {
+                "title": "GPT mới ra mắt",
+                "url": "https://a.com/1",
+                "source": "",
+                "summary": ""
+              },
+              {
+                "title": "Claude cập nhật",
+                "url": "https://c.com/3",
+                "source": "",
+                "summary": ""
+              }
+            ],
+            "item_count": 2,
+            "removed_count": 1,
+            "skipped_invalid": 0
+          }
+        },
+        {
+          "tool": "format",
+          "args": {
+            "items": [
+              {
+                "title": "GPT mới ra mắt",
+                "url": "https://a.com/1",
+                "source": "",
+                "summary": ""
+              },
+              {
+                "title": "Claude cập nhật",
+                "url": "https://c.com/3",
+                "source": "",
+                "summary": ""
+              }
+            ],
+            "template": "sections",
+            "headline": "Tin tức đã gộp"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "sections",
+            "markdown": "# Tin tức đã gộp\n\n## Tổng hợp\n- GPT mới ra mắt - [a.com](https://a.com/1)\n- Claude cập nhật - [c.com](https://c.com/3)\n",
+            "item_count": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_social_search_carryover",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_carryover_three_args",
+        "difficulty": "hard",
+        "what_it_tests": "Gộp 3 thông tin từ 3 lượt thành một lệnh: query=Claude (lượt 1), search_type=Top (lượt 2), limit=3 (lượt 3)."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm tweet về Claude"
+        },
+        {
+          "role": "user",
+          "content": "Lấy loại được quan tâm nhiều nhất thôi"
+        },
+        {
+          "role": "user",
+          "content": "Giữ chủ đề Claude, lấy 3 bài"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Claude",
+              "search_type": "Top",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Claude",
+              "search_type": "Top",
+              "limit": 3
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "Claude",
+            "search_type": "Top",
+            "limit": 3
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "Claude",
+            "search_type": "Top",
+            "items": [
+              {
+                "title": "Introducing Claude Fable 5.2 and Claude Mythos 5.2, designed to tackle the most daunting technical challenges.",
+                "summary": "Introducing Claude Fable 5.2 and Claude Mythos 5.2, designed to tackle the most daunting technical challenges.\n\nThey’re capable collaborators on ambitious projects in many fields, and show improvements in areas like coding, reasoning, and vision. https://t.co/jP0AutLxXb",
+                "url": "https://x.com/claudeai/status/2119867114450268322",
+                "source": "@claudeai",
+                "date": "Mon Nov 09 18:57:59 +0000 2026",
+                "metrics": {
+                  "favorites": 88253,
+                  "retweets": 8443,
+                  "views": "12584177"
+                }
+              },
+              {
+                "title": "THIS IS AN ABSOLUTE GOLDMINE. ",
+                "summary": "THIS IS AN ABSOLUTE GOLDMINE. \n\nSomeone put together 475 video demos created with Claude Opus 5.5 in one GitHub repository.\n\nWe're talking:\n\n- Motion graphics\n- Animated explainers\n- 3D environments\n- Interactive experiences\n- Even playable games\n\nAnd here's the best part:\n\nEvery demo includes its original prompt and source post, so you can study how it was made, recreate it, and experiment with your own ideas.\n\nBuilt with HTML, Canvas, SVG, and Three.js.\n\n475 projects to explore. Endless inspiration to borrow from.\n\n🔖 Save this one. The repo is in the comments. 👇",
+                "url": "https://x.com/isagi1000x/status/2118605635461779637",
+                "source": "@isagi1000x",
+                "date": "Fri Nov 06 07:25:19 +0000 2026",
+                "metrics": {
+                  "favorites": 1454,
+                  "retweets": 159,
+                  "views": "122996"
+                }
+              },
+              {
+                "title": "Introducing Personal Finance in Claude, in beta in the US.",
+                "summary": "Introducing Personal Finance in Claude, in beta in the US.\n\nConnect the accounts you choose, and Claude answers your money questions in everyday language, from your own balances and transactions. Access is read-only, and Claude can't move, manage, or invest your money. https://t.co/V1JLYuWwrS",
+                "url": "https://x.com/claudeai/status/2118403114890137895",
+                "source": "@claudeai",
+                "date": "Thu Nov 05 18:00:35 +0000 2026",
+                "metrics": {
+                  "favorites": 46462,
+                  "retweets": 2727,
+                  "views": "11655232"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_out_of_scope_after_research",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_out_of_scope_after_research",
+        "difficulty": "medium",
+        "what_it_tests": "Hội thoại đang là research nhưng lượt cuối đổi sang giải toán -> không gọi tool nào, không bị cuốn theo ngữ cảnh research trước đó."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tin AI hôm nay có gì?"
+        },
+        {
+          "role": "user",
+          "content": "Cảm ơn, hay đấy"
+        },
+        {
+          "role": "user",
+          "content": "Giờ giải giúp mình phương trình 2x + 3 = 11"
+        }
+      ],
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Xin lỗi, nhưng tôi không thể giúp bạn giải phương trình. Nếu bạn có câu hỏi khác liên quan đến nghiên cứu hoặc thông tin, hãy cho tôi biết!",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G10_still_vague_keeps_asking",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_still_missing_handle",
+        "difficulty": "hard",
+        "what_it_tests": "Sau 3 lượt user vẫn không nêu tài khoản cụ thể (chỉ nói 'một CEO công nghệ') -> phải tiếp tục clarify(text), không tự chọn một người."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Cho mình xem tweet gần đây"
+        },
+        {
+          "role": "user",
+          "content": "Của một CEO công nghệ nào đó"
+        },
+        {
+          "role": "user",
+          "content": "Cứ lấy 5 bài mới nhất là được"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "tech_ceo",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call timeline"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "tech_ceo",
+            "limit": 5
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    }
+  ]
+}
