@@ -110,13 +110,75 @@ def test_policy_instruction_like_lines_go_to_untrusted_text() -> None:
 #   2. bad / missing input from the model (empty string, wrong type, out-of-enum value)
 #   3. failure path (missing key, HTTP error, timeout) -> returns error dict, does not raise
 
-def test_my_new_tool_happy_path() -> None:
-    pytest.skip(TODO)
+# ---- dedupe (tool mới của nhóm) ----
+
+dedupe_tool = TOOL_FUNCTIONS["dedupe"]
 
 
-def test_my_new_tool_bad_input_from_model() -> None:
-    pytest.skip(TODO)
+def test_dedupe_url_treats_same_page_variants_as_duplicates_and_keeps_first() -> None:
+    items = [
+        {"title": "A", "url": "https://www.example.com/post/"},
+        {"title": "B", "url": "http://example.com/post?utm_source=x&utm_medium=y#top"},
+        {"title": "C", "url": "https://EXAMPLE.com/other"},
+        {"title": "D", "url": "https://example.com/post"},
+    ]
+    result = dedupe_tool(items=items)
+
+    assert [i["title"] for i in result["items"]] == ["A", "C"]
+    assert result["item_count"] == 2
+    assert result["removed_count"] == 2
+    assert result["key"] == "url"
 
 
-def test_my_new_tool_failure_returns_error_dict() -> None:
-    pytest.skip(TODO)
+def test_dedupe_url_keeps_pages_that_differ_only_by_real_query_param() -> None:
+    items = [{"url": "https://example.com/watch?v=1"}, {"url": "https://example.com/watch?v=2"}]
+    assert dedupe_tool(items=items)["item_count"] == 2
+
+
+def test_dedupe_by_title_ignores_case_and_extra_whitespace() -> None:
+    items = [
+        {"title": "OpenAI  releases GPT", "url": "https://a.com/1"},
+        {"title": "openai releases gpt", "url": "https://b.com/2"},
+        {"title": "Other news", "url": "https://c.com/3"},
+    ]
+    result = dedupe_tool(items=items, key="title")
+
+    assert [i["url"] for i in result["items"]] == ["https://a.com/1", "https://c.com/3"]
+    assert result["removed_count"] == 1
+
+
+def test_dedupe_keeps_items_missing_the_key_instead_of_merging_them() -> None:
+    items = [{"title": "no url 1"}, {"title": "no url 2"}, {"title": "x", "url": ""}, {"title": "y", "url": "  "}]
+    result = dedupe_tool(items=items)
+
+    assert result["item_count"] == 4
+    assert result["removed_count"] == 0
+
+
+def test_dedupe_empty_or_none_items_does_not_crash() -> None:
+    for empty in (None, []):
+        result = dedupe_tool(items=empty)
+        assert result["items"] == []
+        assert result["item_count"] == 0
+        assert "error" not in result
+
+
+def test_dedupe_skips_non_dict_entries_and_counts_them() -> None:
+    result = dedupe_tool(items=[{"url": "https://a.com"}, "oops", 42, None])
+
+    assert result["item_count"] == 1
+    assert result["skipped_invalid"] == 3
+
+
+def test_dedupe_key_outside_enum_returns_error_dict_instead_of_raising() -> None:
+    result = dedupe_tool(items=[{"url": "https://a.com"}], key="summary")
+
+    assert result["error"] == "ValueError"
+    assert "summary" in result["message"]
+    assert "items" not in result
+
+
+def test_dedupe_items_not_a_list_returns_error_dict_instead_of_raising() -> None:
+    for bad in ("https://a.com", {"url": "https://a.com"}, 5):
+        result = dedupe_tool(items=bad)
+        assert result["error"] == "TypeError"

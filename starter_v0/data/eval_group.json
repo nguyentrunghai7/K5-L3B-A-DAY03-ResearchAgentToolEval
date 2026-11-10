@@ -3,5 +3,116 @@
   "dataset_role": "group",
   "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
   "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "cases": [
+    {
+      "id": "G01_dedupe_by_url",
+      "phase": "B",
+      "suite": "group",
+      "query": "Lọc trùng giúp mình danh sách này theo URL: 1) 'OpenAI ra mô hình mới' - https://openai.com/blog/new-model?utm_source=tw 2) 'OpenAI ra mô hình mới' - https://www.openai.com/blog/new-model/ 3) 'Anthropic cập nhật Claude' - https://anthropic.com/news/claude-update",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "dedupe", "args": {"key": "url"}}]},
+      "metadata": {"skill": "route_to_new_tool", "difficulty": "medium", "what_it_tests": "Tool mới dedupe: user đưa danh sách có link lặp và yêu cầu lọc trùng theo URL -> phải gọi dedupe với key=url, không tự lọc bằng text và không gọi format."}
+    },
+    {
+      "id": "G02_out_of_scope_translate",
+      "phase": "B",
+      "suite": "group",
+      "query": "Dịch giúp mình câu 'Good morning, how are you?' sang tiếng Pháp.",
+      "failure_type": "out_of_scope",
+      "expect": {"no_tool": true, "behavior": "refuse"},
+      "metadata": {"skill": "out_of_scope_translation", "difficulty": "easy", "what_it_tests": "Yêu cầu dịch thuật nằm ngoài phạm vi research -> KHÔNG gọi tool nào (đặc biệt không gọi send hay lookup)."}
+    },
+    {
+      "id": "G03_handle_without_at",
+      "phase": "B",
+      "suite": "group",
+      "query": "Xem 4 bài đăng gần đây của @karpathy",
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "timeline", "args": {"screenname": "karpathy", "limit": 4}}]},
+      "metadata": {"skill": "arg_convention_handle_no_at", "difficulty": "medium", "what_it_tests": "Convention args: user gõ @karpathy nhưng screenname phải là 'karpathy' (không có @), limit=4 lấy đúng số user nói."}
+    },
+    {
+      "id": "G04_org_mention_is_social_search",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tìm các tweet mới nhất nhắc đến Anthropic",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "social_search", "args": {"query": "Anthropic", "search_type": "Latest"}}]},
+      "metadata": {"skill": "routing_social_search_vs_timeline", "difficulty": "medium", "what_it_tests": "Tìm tweet NHẮC ĐẾN một tổ chức là tìm theo từ khóa (social_search, search_type=Latest), không phải xem bài của tài khoản Anthropic (timeline)."}
+    },
+    {
+      "id": "G05_thanks_no_tool",
+      "phase": "B",
+      "suite": "group",
+      "query": "Cảm ơn bạn nhé, mình xong việc rồi!",
+      "failure_type": "unnecessary_tool",
+      "expect": {"no_tool": true, "behavior": "answer_without_tool"},
+      "metadata": {"skill": "no_tool_closing", "difficulty": "easy", "what_it_tests": "Câu cảm ơn/kết thúc hội thoại -> trả lời lịch sự, KHÔNG gọi tool nào (không clarify, không send)."}
+    },
+    {
+      "id": "G06_send_after_confirmation",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Mình muốn đăng một bản tin lên Telegram với nội dung: 'AI hôm nay: có mô hình mới được công bố'"},
+        {"role": "user", "content": "Nội dung đúng rồi, không cần sửa gì"},
+        {"role": "user", "content": "Mình xác nhận, gửi đi ngay bây giờ"}
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {"tool_calls": [{"name": "send", "args": {"confirmed": true}}]},
+      "metadata": {"skill": "send_after_explicit_confirmation", "difficulty": "hard", "what_it_tests": "Ranh giới xác nhận của send: sau khi user đã xác nhận rõ ở lượt cuối thì phải gọi send với confirmed=true, không hỏi lại thêm lần nữa và không để confirmed=false."}
+    },
+    {
+      "id": "G07_dedupe_title_carryover",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Mình có 3 tin: 'GPT mới ra mắt' (https://a.com/1), 'gpt mới ra mắt' (https://b.com/2), 'Claude cập nhật' (https://c.com/3)"},
+        {"role": "user", "content": "Gộp các tin trùng giúp mình"},
+        {"role": "user", "content": "Chỉ xét trùng theo tiêu đề thôi nhé, không quan tâm link"}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "dedupe", "args": {"key": "title"}}]},
+      "metadata": {"skill": "new_tool_arg_from_last_turn", "difficulty": "hard", "what_it_tests": "Tool mới dedupe qua nhiều lượt: danh sách ở lượt 1, lượt cuối đổi tiêu chí sang tiêu đề -> dedupe với key=title (không dùng mặc định url)."}
+    },
+    {
+      "id": "G08_social_search_carryover",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Tìm tweet về Claude"},
+        {"role": "user", "content": "Lấy loại được quan tâm nhiều nhất thôi"},
+        {"role": "user", "content": "Giữ chủ đề Claude, lấy 3 bài"}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "social_search", "args": {"query": "Claude", "search_type": "Top", "limit": 3}}]},
+      "metadata": {"skill": "multiturn_carryover_three_args", "difficulty": "hard", "what_it_tests": "Gộp 3 thông tin từ 3 lượt thành một lệnh: query=Claude (lượt 1), search_type=Top (lượt 2), limit=3 (lượt 3)."}
+    },
+    {
+      "id": "G09_out_of_scope_after_research",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Tin AI hôm nay có gì?"},
+        {"role": "user", "content": "Cảm ơn, hay đấy"},
+        {"role": "user", "content": "Giờ giải giúp mình phương trình 2x + 3 = 11"}
+      ],
+      "failure_type": "out_of_scope",
+      "expect": {"no_tool": true, "behavior": "refuse"},
+      "metadata": {"skill": "multiturn_out_of_scope_after_research", "difficulty": "medium", "what_it_tests": "Hội thoại đang là research nhưng lượt cuối đổi sang giải toán -> không gọi tool nào, không bị cuốn theo ngữ cảnh research trước đó."}
+    },
+    {
+      "id": "G10_still_vague_keeps_asking",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Cho mình xem tweet gần đây"},
+        {"role": "user", "content": "Của một CEO công nghệ nào đó"},
+        {"role": "user", "content": "Cứ lấy 5 bài mới nhất là được"}
+      ],
+      "failure_type": "missing_info",
+      "expect": {"tool_calls": [{"name": "clarify", "args": {"response_type": "text"}}]},
+      "metadata": {"skill": "multiturn_still_missing_handle", "difficulty": "hard", "what_it_tests": "Sau 3 lượt user vẫn không nêu tài khoản cụ thể (chỉ nói 'một CEO công nghệ') -> phải tiếp tục clarify(text), không tự chọn một người."}
+    }
+  ]
 }
