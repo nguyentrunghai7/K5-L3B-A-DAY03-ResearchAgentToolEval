@@ -1,4 +1,4 @@
-# Báo cáo cá nhân — HoVaTen-MSSV
+# Báo cáo cá nhân — VuTuanDat-2A202603744
 
 Đổi tên file theo quy tắc `MSSV_HoTen.md`.
 
@@ -6,9 +6,9 @@ Ví dụ: `20241234_NguyenVanAn.md`.
 
 ## 1. Thông tin thành viên
 
-- Họ tên:
-- MSSV:
-- Email:
+- Họ tên: Vũ Tuấn Đạt  
+- MSSV: 2A202603744
+- Email: datkunal16@gmail.com
 
 ## 2. Phần việc phụ trách
 
