@@ -65,7 +65,9 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 | v0 | Baseline, chưa sửa prompt/tool declaration | Đo hiện trạng để tìm lỗi routing và boundary. | N/A | 0.70 (14/20) | [run v0](../../starter_v0/runs/v0_B_base_openrouter_20261110T180028666992.json) |
 | v1 | `artifacts/system_prompt.md`: hỏi lại khi thiếu account/URL | R10 và R11 sẽ cải thiện nếu cấm đoán account/URL và yêu cầu `clarify(response_type="text")`. | 0.70 (14/20) | 0.85 (17/20) | [run v1](../../starter_v0/runs/v1_B_base_openrouter_20261110T182153182485.json) |
 | v2 | `artifacts/system_prompt.md`: hỏi xác nhận trước khi gửi/đăng | R12 sẽ PASS nếu agent hỏi `clarify(response_type="yes_no")` thay vì gọi `send` ngay. Thực tế R12 vẫn FAIL: agent hỏi về nội dung với `response_type="text"`; M02 cũng chuyển từ PASS thành FAIL. | 0.85 (17/20) | 0.85 (17/20) | [run v2](../../starter_v0/runs/v2_B_base_openrouter_20261110T191037734610.json) |
-| v3 |  |  |  |  |  |
+| v3 | `artifacts/system_prompt.md`: prompt có mục routing, thiếu thông tin, ngoài phạm vi và gửi/đăng | Quy tắc routing rõ hơn sẽ tăng case accuracy và tool routing accuracy. R01 và M02 chuyển sang PASS; R12 vẫn dùng `clarify(response_type="text")`, M06 gọi thừa `social_search`. | 0.85 (17/20) | 0.90 (18/20) | [run v3](../../starter_v0/runs/v3_B_base_openrouter_20261110T192900085847.json) |
+
+Lưu ý về v3: prompt do nhóm đề xuất thay nhiều quy tắc cùng lúc, nên run này cho thấy hiệu quả của **toàn bộ prompt v3**, không tách được tác động của từng quy tắc. Ở R12, mục "Missing information" yêu cầu hỏi `response_type=text` khi chưa rõ nội dung gửi, trong khi mục "Sending" yêu cầu hành động đầu tiên là `response_type=yes_no`; hai chỉ dẫn này cần được làm rõ ở vòng tiếp theo.
 
 ### B2. Failure Analysis
 
