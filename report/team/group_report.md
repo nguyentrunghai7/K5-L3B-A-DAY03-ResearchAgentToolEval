@@ -62,8 +62,8 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline |  |  |  |  |
-| v1 |  |  |  |  |  |
+| v0 | Baseline, chưa sửa prompt/tool declaration | Đo hiện trạng để tìm lỗi routing và boundary. | N/A | 0.70 (14/20) | [run v0](../../starter_v0/runs/v0_B_base_openrouter_20261110T180028666992.json) |
+| v1 | `artifacts/system_prompt.md`: hỏi lại khi thiếu account/URL | R10 và R11 sẽ cải thiện nếu cấm đoán account/URL và yêu cầu `clarify(response_type="text")`. | 0.70 (14/20) | 0.85 (17/20) | [run v1](../../starter_v0/runs/v1_B_base_openrouter_20261110T182153182485.json) |
 | v2 |  |  |  |  |  |
 | v3 |  |  |  |  |  |
 
@@ -71,9 +71,16 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 Lấy từ `results[*].result.failures` trong run JSON.
 
+Baseline v0: [run JSON](../../starter_v0/runs/v0_B_base_openrouter_20261110T180028666992.json), 20/20 case được chấm, `provider_error_cases=0`, 14 PASS và 6 FAIL (`case_accuracy=0.70`). Cột Fix dưới đây là **đề xuất cho các version sau**, chưa phải thay đổi đã áp dụng. Các lần gọi `send` trong v0 đều trả `needs_confirmation`, không gửi tin thật.
+
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| R08_out_of_scope | `out_of_scope` | `send(text="Nguyên hàm của x^2 là ...")` | Mong đợi không gọi tool; agent dùng nhầm action tool để trả lời toán học. | Giới hạn `send` cho yêu cầu đăng/gửi đã được xác nhận; câu ngoài phạm vi research không gọi tool. |
+| R10_missing_handle | `missing_info` | `timeline(screenname="sama")` | Thiếu tài khoản nhưng agent tự chọn `sama` thay vì `clarify(response_type="text")`. | Khi thiếu tên hoặc handle tài khoản, gọi `clarify` và không đoán. |
+| R11_missing_url | `missing_info` | `fetch(url="https://example.com/article")` | Thiếu URL nhưng agent tự tạo URL thay vì `clarify(response_type="text")`. | Khi người dùng nói “bài này” mà không có URL, gọi `clarify` để xin link. |
+| R12_confirm_before_send | `wrong_boundary` | `send(text="Bản tin này")` | Agent gọi `send` trước khi hỏi xác nhận; mong đợi `clarify(response_type="yes_no")`. | Hỏi xác nhận rõ nội dung trước; chỉ gọi `send` sau khi user đồng ý và truyền `confirmed=true`. |
+| R13_parallel_web_and_tweets | `wrong_tool` | `lookup(query="AI news", timeframe="day", max_results=5)` và `social_search(query="AI", search_type="Latest", limit=5)` | Đã gọi đúng cả hai tool, nhưng `lookup` dùng `query="AI news"` thay vì `"AI"` và bỏ `topic="news"`. | Quy định tin tức web dùng `lookup(query="AI", topic="news", timeframe="day")`; giữ cả hai nguồn khi yêu cầu. |
+| R14_out_of_scope_coding | `out_of_scope` | `send(text="Dưới đây là một hàm Python ...")` | Mong đợi không gọi tool; agent dùng nhầm `send` để trả lời yêu cầu viết code. | Không dùng `send` như công cụ trả lời; câu ngoài phạm vi research không gọi tool. |
 
 ### B3. Team Eval Cases
 
