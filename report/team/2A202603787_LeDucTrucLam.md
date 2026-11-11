@@ -14,7 +14,6 @@ CP3 (tool mới và unit test) và CP4 (10 eval case của nhóm). Cả nhóm l�
 
 - **CP3:** viết tool mới `dedupe` (`tools/dedupe/tool.py`, `TOOL.md`), đăng ký trong `tools/__init__.py` và `tools.yaml`, viết 8 unit test trong `tests/test_tools_todo.py` (happy path, input xấu, nhánh lỗi); `pytest` 0 failed.
 - **CP4:** viết 10 eval case (5 single + 5 multi turn) trong `data/eval_group.json`, trong đó 2 case route tới `dedupe`; chạy `--suite group` (8/10 pass), phân tích 2 case FAIL (G07, G10).
-- Chưa xong: điền `TEAM.md` (tên nhóm, bảng thành viên, vai trò) và mục "Tên nhóm" trong `group_report.md`; kiểm tra mỗi thành viên đều có commit kỹ thuật.
 
 ## 4. Bằng chứng
 
