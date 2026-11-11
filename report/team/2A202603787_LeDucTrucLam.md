@@ -28,4 +28,6 @@ CP3 (tool mới và unit test) và CP4 (10 eval case của nhóm). Cả nhóm l�
 
 ## 5. Tự đánh giá
 
-(Bạn tự điền: điều gì làm tốt, điều gì chưa, và bạn có giải thích được vì sao tool `dedupe` và các case G07, G10 được thiết kế như vậy không.)
+Trong bài lab này, qua quá trình chạy test AI, mình đã có hiểu biết tốt về từng case test và mục đích của các case đó, ví dụ như test yêu cầu clarify những thông tin không rõ khi user hỏi, hoặc test yêu cầu confirm trước khi gửi hay đăng bài. 
+
+Quá trình quan sát các bài đăng hay tin tức, mình đã phát hiện 1 số tin bị trùng lặp, do vậy mình đã nảy ra ý tưởng build thêm tool dedupe để gộp các tin hay bài đăng MXH bị trùng theo tiêu đề (không theo URL), giúp hạn chế trùng lặp và user có thể đọc nhiều tin khác nhau hơn. Dẫu vậy, tool này hoạt động chưa thực sự tốt khi một số tin vẫn bị bỏ sót không rõ lý do, và nhóm mình sẽ cần phải nghiên cứu sâu hơn lý do mà tool chưa hoạt động tốt và đưa ra cách khắc phục.
